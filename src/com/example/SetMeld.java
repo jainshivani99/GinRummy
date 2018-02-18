@@ -15,35 +15,35 @@ public class SetMeld extends Meld {
     public static final int MIN_CARDS = 3;
     public static final int MAX_CARDS = 4;
 
-    private Set<Card> cardsInMeld;
+    private Set<com.example.Card> cardsInMeld;
 
-    protected SetMeld(Collection<Card> initialCards) {
+    protected SetMeld(Collection<com.example.Card> initialCards) {
         super();
 
-        cardsInMeld = new HashSet<Card>(initialCards);
+        cardsInMeld = new HashSet<com.example.Card>(initialCards);
     }
 
-    protected SetMeld(Card[] initialCards) {
+    protected SetMeld(com.example.Card[] initialCards) {
         this(Arrays.asList(initialCards));
     }
 
     @Override
-    public boolean containsCard(Card cardToCheck) {
+    public boolean containsCard(com.example.Card cardToCheck) {
         return cardsInMeld.contains(cardToCheck);
     }
 
     @Override
-    public boolean canAppendCard(Card newCard) {
+    public boolean canAppendCard(com.example.Card newCard) {
         if (cardsInMeld.size() >= MAX_CARDS || cardsInMeld.contains(newCard)) {
             return false;
         }
 
-        Card firstCard = cardsInMeld.iterator().next();
+        com.example.Card firstCard = cardsInMeld.iterator().next();
         return (newCard.getRank() == firstCard.getRank());
     }
 
     @Override
-    public void appendCard(Card newCard) {
+    public void appendCard(com.example.Card newCard) {
         if (!canAppendCard(newCard)) {
             throw new IllegalMeldModificationException();
         }
@@ -52,7 +52,7 @@ public class SetMeld extends Meld {
     }
 
     @Override
-    public boolean canRemoveCard(Card cardToRemove) {
+    public boolean canRemoveCard(com.example.Card cardToRemove) {
         if (cardsInMeld.size() <= MIN_CARDS || !cardsInMeld.contains(cardToRemove)) {
             return false;
         }
@@ -61,7 +61,7 @@ public class SetMeld extends Meld {
     }
 
     @Override
-    public void removeCard(Card cardToRemove) {
+    public void removeCard(com.example.Card cardToRemove) {
         if (!canRemoveCard(cardToRemove)) {
             throw new IllegalMeldModificationException();
         }
@@ -70,8 +70,8 @@ public class SetMeld extends Meld {
     }
 
     @Override
-    public Card[] getCards() {
-        Card[] arrayToReturn = new Card[cardsInMeld.size()];
+    public com.example.Card[] getCards() {
+        com.example.Card[] arrayToReturn = new com.example.Card[cardsInMeld.size()];
         return cardsInMeld.toArray(arrayToReturn);
     }
 }

@@ -15,21 +15,21 @@ public class RunMeld extends Meld {
     public static final int MIN_CARDS = 3;
     public static final int MAX_CARDS = 10;
 
-    private List<Card> cardsInMeld;
+    private List<com.example.Card> cardsInMeld;
 
-    protected RunMeld(Card[] initialCards) {
+    protected RunMeld(com.example.Card[] initialCards) {
         super();
 
-        cardsInMeld = new ArrayList<Card>(Arrays.asList(initialCards));
+        cardsInMeld = new ArrayList<com.example.Card>(Arrays.asList(initialCards));
     }
 
     @Override
-    public boolean containsCard(Card cardToCheck) {
+    public boolean containsCard(com.example.Card cardToCheck) {
         return cardsInMeld.contains(cardToCheck);
     }
 
     @Override
-    public boolean canAppendCard(Card newCard) {
+    public boolean canAppendCard(com.example.Card newCard) {
         if (cardsInMeld.size() >= MAX_CARDS || cardsInMeld.contains(newCard)) {
             return false;
         }
@@ -46,7 +46,7 @@ public class RunMeld extends Meld {
     }
 
     @Override
-    public void appendCard(Card newCard) {
+    public void appendCard(com.example.Card newCard) {
         if (!canAppendCard(newCard)) {
             throw new IllegalMeldModificationException();
         }
@@ -62,7 +62,7 @@ public class RunMeld extends Meld {
     }
 
     @Override
-    public boolean canRemoveCard(Card cardToRemove) {
+    public boolean canRemoveCard(com.example.Card cardToRemove) {
         if (cardsInMeld.size() <= MIN_CARDS || !cardsInMeld.contains(cardToRemove)) {
             return false;
         }
@@ -72,7 +72,7 @@ public class RunMeld extends Meld {
     }
 
     @Override
-    public void removeCard(Card cardToRemove) {
+    public void removeCard(com.example.Card cardToRemove) {
         if (!canRemoveCard(cardToRemove)) {
             throw new IllegalMeldModificationException();
         }
@@ -81,8 +81,8 @@ public class RunMeld extends Meld {
     }
 
     @Override
-    public Card[] getCards() {
-        Card[] arrayToReturn = new Card[cardsInMeld.size()];
+    public com.example.Card[] getCards() {
+        com.example.Card[] arrayToReturn = new com.example.Card[cardsInMeld.size()];
         return cardsInMeld.toArray(arrayToReturn);
     }
 }

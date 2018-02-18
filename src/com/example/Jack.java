@@ -1,27 +1,16 @@
+package com.example;
+
 import com.example.Card;
 import com.example.Meld;
 import com.example.PlayerStrategy;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class Shivani implements PlayerStrategy{
+public class Jack implements PlayerStrategy {
 
-    private List<Card> hand = new ArrayList<Card>();
+    private List<Card> playerHand;
 
-    public List<Card> getHand() {
-        return hand;
-    }
-
-    /**
-     * Called by the game engine for each player at the beginning of each round to receive and
-     * process their initial hand dealt.
-     *
-     * @param hand The initial hand dealt to the player
-     */
-    public void receiveInitialHand(List<Card> hand){
-        this.hand = hand;
-    }
+    public void receiveInitialHand(List<Card> hand){}
 
     public boolean willTakeTopDiscard(Card card){
         return false;

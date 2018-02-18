@@ -1,10 +1,12 @@
+package com.example;
+
 import com.example.Card;
 import com.example.Meld;
 import com.example.PlayerStrategy;
 
 import java.util.List;
 
-public class Jack implements PlayerStrategy {
+public class Jill implements PlayerStrategy {
 
     private List<Card> playerHand;
 
@@ -31,6 +33,5 @@ public class Jack implements PlayerStrategy {
     }
 
     public void reset(){}
-
 
 }

@@ -10,7 +10,7 @@ public interface PlayerStrategy {
      *
      * @param hand The initial hand dealt to the player
      */
-    public void receiveInitialHand(List<Card> hand);
+    public void receiveInitialHand(List<com.example.Card> hand);
 
     /**
      * Called by the game engine to prompt the player on whether they want to take the top card
@@ -19,7 +19,7 @@ public interface PlayerStrategy {
      * @param card The card on the top of the discard pile
      * @return whether the user takes the card on the discard pile
      */
-    public boolean willTakeTopDiscard(Card card);
+    public boolean willTakeTopDiscard(com.example.Card card);
 
     /**
      * Called by the game engine to prompt the player to take their turn given a
@@ -28,7 +28,7 @@ public interface PlayerStrategy {
      * @param drawnCard The card the player was dealt
      * @return The card the player has chosen to discard
      */
-    public Card drawAndDiscard(Card drawnCard);
+    public com.example.Card drawAndDiscard(com.example.Card drawnCard);
 
     /**
      * Called by the game engine to prompt the player is whether they would like to
@@ -46,7 +46,7 @@ public interface PlayerStrategy {
      * @param previousDiscardTop What the opponent could have drawn from the discard if they chose to
      * @param opponentDiscarded The card that the opponent discarded
      */
-    public void opponentEndTurnFeedback(boolean drewDiscard, Card previousDiscardTop, Card opponentDiscarded);
+    public void opponentEndTurnFeedback(boolean drewDiscard, com.example.Card previousDiscardTop, com.example.Card opponentDiscarded);
 
     /**
      * Called by the game engine when the round has ended to provide this player strategy
@@ -55,7 +55,7 @@ public interface PlayerStrategy {
      * @param opponentHand The opponent's hand at the end of the round
      * @param opponentMelds The opponent's Melds at the end of the round
      */
-    public void opponentEndRoundFeedback(List<Card> opponentHand, List<Meld> opponentMelds);
+    public void opponentEndRoundFeedback(List<com.example.Card> opponentHand, List<Meld> opponentMelds);
 
     /**
      * Called by the game engine to allow access the player's current list of Melds.
