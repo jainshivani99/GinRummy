@@ -61,7 +61,23 @@ public class Shivani implements PlayerStrategy{
      * @return The card the player has chosen to discard
      */
     public Card drawAndDiscard(Card drawnCard){
-        return null;
+        cardsNotInMeld.add(drawnCard);
+        Card cardToDiscard = cardsNotInMeld.get(0);
+        for (Meld meldObj : totalMelds) {
+            //check if your drawn card can be appended to a meld
+            //if it can, remove a different card from your hand
+            if (meldObj.canAppendCard(drawnCard)) {
+                meldObj.appendCard(drawnCard);
+                cardsNotInMeld.remove(drawnCard);
+                cardsNotInMeld.remove(cardToDiscard);
+                break;
+            } else {
+                //if it cannot, remove that same card
+                cardsNotInMeld.remove(drawnCard);
+            }
+        }
+        return cardToDiscard;
+
     }
 
     /**
