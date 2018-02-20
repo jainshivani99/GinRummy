@@ -66,7 +66,7 @@ public class GameEngine {
 
         //Both player hand are unsorted
         p1.receiveInitialHand(hand1);
-        p2.receiveInitialHand(hand2);
+        //p2.receiveInitialHand(hand2);
     }
 
 /*
@@ -86,14 +86,14 @@ public class GameEngine {
             //p2 should be able to check if he can use his cards in p1's melds
             //add the points to either p1 or p2
             //start a new round
-            //this functionality should go in knock() itself
             List<Meld> p1Melds = p1.getMelds();
+            //get cardsNotInMeld for player 2
+
         } else if (p2.knock()) {
             //p2 reveals their cards
             //p1 should be able to check if he can use his cards in p2's melds
             //add the points to either p1 or p2
             //start a new round
-            //this functionality should go in knock() itself
             List<Meld> p2Melds = p2.getMelds();
         } else {
             p1.willTakeTopDiscard(topCard);
@@ -133,7 +133,7 @@ public class GameEngine {
         }else {*/
             //p1 has option to pick the open card
             //If p1 picks open card
-            // p1 add to exisitng melds or in deadwood card pile
+            // p1 add to exisiting melds or in deadwood card pile
             //p1 will discard one card - this will mostly alter deadwood cards unless he throws the same picked card
             //P1 calculates deadwood points
             //else

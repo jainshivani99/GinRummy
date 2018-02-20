@@ -130,25 +130,51 @@ public class Shivani implements PlayerStrategy{
         //RunSort: Sort cardsNotInMeld (initially full hand) based on suit and then rank
         List<Card> p1PotentialRunMeld = new ArrayList<Card>(cardsNotInMeld);
         //Shuffling the cards cardsNotInMeld to test if RunSort worked - Comment/remove after test
-        Collections.shuffle(p1PotentialRunMeld);
+        //Collections.shuffle(p1PotentialRunMeld);
+        Collections.sort(p1PotentialRunMeld);
 
-        Collections.sort(p1PotentialRunMeld, new Comparator<Card>() {
-            @Override
-            public int compare(Card o1, Card o2) {
-                int suitDifference = o1.getSuit().ordinal() - o2.getSuit().ordinal();
-                if (suitDifference == 0) {
-                    return o1.getRankValue() - o2.getRankValue();
-                }
-                return suitDifference;
-            }
-        });
+//        Collections.sort(p1PotentialRunMeld, new Comparator<Card>() {
+//            @Override
+//            public int compare(Card o1, Card o2) {
+//                int suitDifference = o1.getSuit().ordinal() - o2.getSuit().ordinal();
+//                if (suitDifference == 0) {
+//                    return o1.getRankValue() - o2.getRankValue();
+//                }
+//                return suitDifference;
+//            }
+//        });
 
         //Iterate through sorted cardsNotInMeld (initially full hand) = p1PotentialRunMeld
-//        int startingIndex = 0;
-//        int endingIndex = p1PotentialRunMeld.size() - 1;
-//        while (startingIndex < endingIndex) {
+        //int endingIndex = p1PotentialRunMeld.size() - 1;
+        List<Card> p1PotentialRunMeld2 = new ArrayList<Card>();
+        for (int i = 0; i < p1PotentialRunMeld.size();) {
+            int currentCardRankValue = p1PotentialRunMeld.get(i).getRankValue();
+            Card.CardSuit currentSuit = p1PotentialRunMeld.get(i).getSuit();
+
+            for (int j = 0; j < p1PotentialRunMeld.size(); j++) {
+                Card nextCard = p1PotentialRunMeld.get(j);
+                if (nextCard.getSuit().equals(currentSuit)) {
+                    if (nextCard.getRankValue() == (currentCardRankValue + 1)) {
+                        p1PotentialRunMeld2.add(nextCard);
+                        currentCardRankValue = nextCard.getRankValue();
+                    }
+                }
+            }
+
+            RunMeld p1RunMeld = Meld.buildRunMeld(p1PotentialRunMeld2);
+
+            if (p1RunMeld != null) {
+                totalMelds.add(p1RunMeld);
+                cardsNotInMeld.removeAll(p1PotentialRunMeld2);
+                i = 0;
+            } else {
+                i++;
+            }
+
+        }
+//        while (index < endingIndex) {
 //            //Check if all cardsNotInMeld are of same rank, if yes do what?
-//            if (p1PotentialRunMeld.get(startingIndex).getRank() == p1PotentialRunMeld.get(endingIndex).getRank()) {
+//            if (p1PotentialRunMeld.get(index).getRank() == p1PotentialRunMeld.get(endingIndex).getRank()) {
 //
 //            }
 //            List<Card> p1PotentialRunMeld2 = new ArrayList<Card>(p1PotentialRunMeld);
@@ -157,10 +183,10 @@ public class Shivani implements PlayerStrategy{
 //                //equal to first element + 9
 //            //}
 //        }
-        //List<Card> p1PotentialRunMeld2 = new ArrayList<Card>();
-        //p1PotentialRunMeld2.add(p1PotentialRunMeld.get(0));
-        //p1PotentialRunMeld2.add(p1PotentialRunMeld.get(1));
-        //RunMeld p1RunMeld = Meld.buildRunMeld(p1PotentialRunMeld);
+//        List<Card> p1PotentialRunMeld2 = new ArrayList<Card>();
+//        p1PotentialRunMeld2.add(p1PotentialRunMeld.get(0));
+//        p1PotentialRunMeld2.add(p1PotentialRunMeld.get(1));
+//        RunMeld p1RunMeld = Meld.buildRunMeld(p1PotentialRunMeld);
         System.out.println("");
     }
 
