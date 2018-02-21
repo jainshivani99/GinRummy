@@ -22,11 +22,11 @@ public class GameEngine {
         // Initialize deck, shuffle deck, deal deck, create discard pile, play first round and play normalRounds
 
         GameEngine.initializeDeck();
-        //GameEngine.shuffleDeck();
+        GameEngine.shuffleDeck();
         GameEngine.dealDeck();
 
-        GameEngine.playFirstRound();
-        //GameEngine.playNormalRound();
+        PlayerStrategy nextActionPlayer = GameEngine.playFirstRound();
+        GameEngine.playNormalRound(nextActionPlayer);
     }
 
     //-------------------------------------------------------------------------------
@@ -35,7 +35,7 @@ public class GameEngine {
     public static void initializeDeck() {
         deck = new ArrayList<Card>();
         deck.addAll(Card.getAllCards());
-        Collections.sort(deck);
+        //Collections.sort(deck);
     }
 
     //-------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ public class GameEngine {
     public static void dealDeck() {
         List<Card> hand1 = new ArrayList<Card>();
         List<Card> hand2 = new ArrayList<Card>();
-        for (int i = 0; i < 10; i++) {
-            if (i % 1 == 0) {
+        for (int i = 0; i < 20; i++) {
+            if (i % 2 == 0) {
                 //beginning of the array is the top of the deck
                 hand1.add(deck.remove(0));
             } else {
@@ -66,132 +66,77 @@ public class GameEngine {
 
         //Both player hand are unsorted
         p1.receiveInitialHand(hand1);
-        //p2.receiveInitialHand(hand2);
+        p2.receiveInitialHand(hand2);
     }
 
-/*
-    public static List<Card> getDiscardPile() {
-        return discardPile;
-    }
-*/
 
     //-------------------------------------------------------------------------------
-    // Playing the first round
+    /** Playing the first round
+     @return The PlayerStrategy that goes next.
+     */
+    public static PlayerStrategy playFirstRound() {
+        // TODO(jainshivani99) Can players knock right after receiving
+        // their hands??
+        // Assume players can only knock/gin at the end of a round.
 
-    //Assume that p1 is always the starting player
-    public static void playFirstRound() {
+        // Assume that p1 is always the starting player
         Card topCard = discardPile.get(0);
+        Card returnCard;
+        PlayerStrategy nextActionPlayer;
+        if (p1.willTakeTopDiscard(topCard)) {
+            returnCard = p1.drawAndDiscard(topCard);
+            nextActionPlayer = p2;
+            p2.opponentEndTurnFeedback(true, topCard, returnCard);
+        } else if (p2.willTakeTopDiscard(topCard)) {
+            returnCard = p2.drawAndDiscard(topCard);
+            nextActionPlayer = p1;
+            p1.opponentEndTurnFeedback(true, topCard, returnCard);
+        } else { // p1 MUST draw from the deck
+            Card drawCard = deck.get(0);
+            deck.remove(0);
+            returnCard = p1.drawAndDiscard(drawCard);
+            nextActionPlayer = p2;
+            p2.opponentEndTurnFeedback(true, drawCard, returnCard);
+        }
+        // put return card ON TOP OF discard pile.
+        discardPile.add(0, returnCard);
+
+
+        // allow players to knock/gin
+        // Assume starting player can gin first.
         if (p1.knock()) {
-            //p1 reveals their cards
-            //p2 should be able to check if he can use his cards in p1's melds
-            //add the points to either p1 or p2
-            //start a new round
-            List<Meld> p1Melds = p1.getMelds();
-            //get cardsNotInMeld for player 2
+            // p1 reveals their cards
+            Tuple<List<Meld>, List<Card>> revealCards = p1.revealCards();
+            // p2 should be able to check if he can use his cards in p1's melds
+            // add the points to either p1 or p2
+            List<Meld> p1Melds = revealCards.first();
+            List<Card> p1DeadwoodCards = revealCards.second();
+            // Award points
 
+            // check if game is over depending on number of points.
         } else if (p2.knock()) {
-            //p2 reveals their cards
-            //p1 should be able to check if he can use his cards in p2's melds
-            //add the points to either p1 or p2
-            //start a new round
-            List<Meld> p2Melds = p2.getMelds();
-        } else {
-            p1.willTakeTopDiscard(topCard);
+            // follow strategy from above.
         }
 
-        //if p1 didn't choose from the discard pile, p2 automatically has the chance to choose from the discard pile
-        if (p1.willTakeTopDiscard(topCard) == false) {
-            p2.willTakeTopDiscard(topCard);
-            if (p2.willTakeTopDiscard(topCard)) {
-                p2.drawAndDiscard(topCard);
-            }
-        } else {
-            //if p1 chose from the discard pile, they have to handle their new card and discard another card from their hand
-            p1.drawAndDiscard(topCard);
-        }
+        return nextActionPlayer;
+    }
 
 
- /*       if(p1DeadwoodPoints == 0){
-            // Call p1.gin
-            //Calculate game settlement points and add/subtract from p1 & p1 current settlement points
-            //game over, start new game
-        }else if(p1DeadwoodPoints <= p1.getKnockLevel()){
-            // Call p1.knock
-            //P2 tries to fit his deadwood cards in melds of P1
-            //Calculate P2 deadwood points again
-            //Calculate game settlement points and add/subtract from p1 & p1 current settlement points
-        }else if(p2DeadwoodPoints == 0){
-            // Call p2.gin
-            //Calculate game settlement points and add/subtract from p1 & p1 current settlement points
-            //game over, start new game
-        }else if(p2DeadwoodPoints <= p2.getKnockLevel()){
-            // Call p2.knock
-            //P1 tries to fit his deadwood cards in melds of P2
-            //Calculate P1 deadwood points again
-            //Calculate game settlement points and add/subtract from p1 & p1 current settlement points
-            //game over, start new game
-        }else {*/
-            //p1 has option to pick the open card
-            //If p1 picks open card
-            // p1 add to exisiting melds or in deadwood card pile
-            //p1 will discard one card - this will mostly alter deadwood cards unless he throws the same picked card
-            //P1 calculates deadwood points
-            //else
-            //p2 has option to pick the open card
-            //If p2 picks open card
-            //p2 will discard one card - this will mostly alter deadwood cards unless he throws the same picked card
-            //P2 calculates deadwood points
-            //Again check p1 gin or knock and p2 gin or knock as above
-        }
-
-//        Following commented code to be removed
-//        boolean drewDiscarded = false;
-//        int p1DwpRun = GameEngine.calculateDeadwoodPoints(playerRunMeld, p1.getHand());
-//        //Run setMeld with p1's hand & get deadwood points
-//        Meld playerSetMeld = Meld.buildSetMeld(p1.getHand());
-//        int p1DwpSet = GameEngine.calculateDeadwoodPoints(playerSetMeld, p1.getHand());
-//        //get the first card from the discard pile
-//        Card topCard = discardPile.get(0);
-//        //compare 2 deadwood points from above & keep the meld with lower deadwood points
-//        if (playerRunMeld != null || playerSetMeld != null) {
-//            if (p1DwpRun > p1DwpSet) {
-//                playerRunMeld = null;
-//            } else {
-//                playerSetMeld = null;
-//            }
-//            if (playerRunMeld.canAppendCard(topCard) || playerSetMeld.canAppendCard(topCard)) {
+    //-------------------------------------------------------------------------------
+    // Playing the Normal round
+    public static void playNormalRound(PlayerStrategy nextActionPlayer) {
+        // TODO(jainshivani99) do implementation, following similar style
+        // to playFirstRound.
+        return;
+    }
+    //-------------------------------------------------------------------------------
+//    // Calculate deadwood points
+//    public static int calculateDeadwoodPoints (List<Card> cardsNotInMeld, int deadwoodPoints) {
 //
-//            }
+//        for (Card cardObj : cardsNotInMeld) {
+//            deadwoodPoints += cardObj.getPointValue();
 //        }
-//        p1.willTakeTopDiscard(topCard);
+//        return deadwoodPoints;
+//    }
+}
 
-    //-------------------------------------------------------------------------------
-    /*// Playing the Normal round
-    public static void playNormalRound() {
-
-    }
-    //-------------------------------------------------------------------------------
-    // Calculate deadwood points
-    public static int calculateDeadwoodPoints (List<Card> cardsNotInMeld, int deadwoodPoints) {
-
-        for (Card cardObj : cardsNotInMeld) {
-            deadwoodPoints += cardObj.getPointValue();
-        }
-        return deadwoodPoints;*/
-
-//    public static int calculateDeadwoodPoints(Meld playerMeld, List<Card> playerHand) {
-//        if (playerMeld != null) {
-//            for (Card cardObj : playerHand) {
-//                if (!playerMeld.containsCard(cardObj)) {
-//                    deadwoodPoints += cardObj.getPointValue();
-//                }
-//            }
-//        } else {
-//            for (Card cardObj : playerHand) {
-//                deadwoodPoints += cardObj.getPointValue();
-//            }
-//        }
-
-    }
-//--------------------------------------------------------------------------------
-//}

@@ -61,23 +61,7 @@ public class Shivani implements PlayerStrategy{
      * @return The card the player has chosen to discard
      */
     public Card drawAndDiscard(Card drawnCard){
-        cardsNotInMeld.add(drawnCard);
-        Card cardToDiscard = cardsNotInMeld.get(0);
-        for (Meld meldObj : totalMelds) {
-            //check if your drawn card can be appended to a meld
-            //if it can, remove a different card from your hand
-            if (meldObj.canAppendCard(drawnCard)) {
-                meldObj.appendCard(drawnCard);
-                cardsNotInMeld.remove(drawnCard);
-                cardsNotInMeld.remove(cardToDiscard);
-                break;
-            } else {
-                //if it cannot, remove that same card
-                cardsNotInMeld.remove(drawnCard);
-            }
-        }
-        return cardToDiscard;
-
+        return null;
     }
 
     /**
@@ -130,7 +114,11 @@ public class Shivani implements PlayerStrategy{
      * competing it against a new opponent.
      */
     public void reset(){
-
+        //clear the hand of cards and all melds, reset the deadwood points to 0
+        hand.clear();
+        cardsNotInMeld.clear();
+        totalMelds.clear();
+        deadwoodPoints = 0;
     }
 
     //-------------------------------------------------------------------------------
