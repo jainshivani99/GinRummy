@@ -92,7 +92,8 @@ public class Jack implements PlayerStrategy {
      * Called by the game engine to allow this player strategy to reset its internal state before
      * competing it against a new opponent.
      */
-    public void reset(){}
+    public void reset(){
 
+    }
 
 }

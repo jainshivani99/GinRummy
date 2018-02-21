@@ -12,7 +12,7 @@ import java.util.List;
 public class Shivani implements PlayerStrategy{
 
     //The player's hand of cards
-    private List<Card> hand = new ArrayList<Card>();
+    private static List<Card> hand = new ArrayList<Card>();
     private static List<Card> cardsNotInMeld = new ArrayList<Card>();
     private static List<Meld> totalMelds = new ArrayList<Meld>();
     private static int deadwoodPoints;
@@ -28,7 +28,7 @@ public class Shivani implements PlayerStrategy{
      */
     public void receiveInitialHand(List<Card> hand){
         cardsNotInMeld = hand;
-        Shivani.createRunMeld();
+        //Shivani.createRunMeld();
         Shivani.createSetMeld();
         deadwoodPoints = Shivani.calculateDeadwoodPoints();
         knock();
@@ -61,7 +61,23 @@ public class Shivani implements PlayerStrategy{
      * @return The card the player has chosen to discard
      */
     public Card drawAndDiscard(Card drawnCard){
-        return null;
+        cardsNotInMeld.add(drawnCard);
+        Card cardToDiscard = cardsNotInMeld.get(0);
+        for (Meld meldObj : totalMelds) {
+            //check if your drawn card can be appended to a meld
+            //if it can, remove a different card from your hand
+            if (meldObj.canAppendCard(drawnCard)) {
+                meldObj.appendCard(drawnCard);
+                cardsNotInMeld.remove(drawnCard);
+                cardsNotInMeld.remove(cardToDiscard);
+                break;
+            } else {
+                //if it cannot, remove that same card
+                cardsNotInMeld.remove(drawnCard);
+            }
+        }
+        return cardToDiscard;
+
     }
 
     /**
@@ -133,20 +149,17 @@ public class Shivani implements PlayerStrategy{
 
         //RunSort: Sort cardsNotInMeld (initially full hand) based on suit and then rank
         List<Card> p1PotentialRunMeld = new ArrayList<Card>(cardsNotInMeld);
-        //Shuffling the cards cardsNotInMeld to test if RunSort worked - Comment/remove after test
-        //Collections.shuffle(p1PotentialRunMeld);
-        Collections.sort(p1PotentialRunMeld);
 
-//        Collections.sort(p1PotentialRunMeld, new Comparator<Card>() {
-//            @Override
-//            public int compare(Card o1, Card o2) {
-//                int suitDifference = o1.getSuit().ordinal() - o2.getSuit().ordinal();
-//                if (suitDifference == 0) {
-//                    return o1.getRankValue() - o2.getRankValue();
-//                }
-//                return suitDifference;
-//            }
-//        });
+        Collections.sort(p1PotentialRunMeld, new Comparator<Card>() {
+            @Override
+            public int compare(Card o1, Card o2) {
+                int suitDifference = o1.getSuit().ordinal() - o2.getSuit().ordinal();
+                if (suitDifference == 0) {
+                    return o1.getRankValue() - o2.getRankValue();
+                }
+                return suitDifference;
+            }
+        });
 
         //Iterate through sorted cardsNotInMeld (initially full hand) = p1PotentialRunMeld
         //int endingIndex = p1PotentialRunMeld.size() - 1;
@@ -176,22 +189,7 @@ public class Shivani implements PlayerStrategy{
             }
 
         }
-//        while (index < endingIndex) {
-//            //Check if all cardsNotInMeld are of same rank, if yes do what?
-//            if (p1PotentialRunMeld.get(index).getRank() == p1PotentialRunMeld.get(endingIndex).getRank()) {
-//
-//            }
-//            List<Card> p1PotentialRunMeld2 = new ArrayList<Card>(p1PotentialRunMeld);
-//            //if (p1PotentialRunMeld.get(0).getRank()) {
-//                //special case- check to see if the there is a run of 10 cards, check 10th element to see if it is
-//                //equal to first element + 9
-//            //}
-//        }
-//        List<Card> p1PotentialRunMeld2 = new ArrayList<Card>();
-//        p1PotentialRunMeld2.add(p1PotentialRunMeld.get(0));
-//        p1PotentialRunMeld2.add(p1PotentialRunMeld.get(1));
-//        RunMeld p1RunMeld = Meld.buildRunMeld(p1PotentialRunMeld);
-        System.out.println("");
+
     }
 
 
@@ -199,8 +197,6 @@ public class Shivani implements PlayerStrategy{
     public static void createSetMeld() {
         //Sort remaining cards based on rank to create Set Meld
         List<Card> p1PotentialSetMeld = new ArrayList(cardsNotInMeld);
-        //Shuffling the cards cardsNotInMeld to test if SetSort worked - Comment/remove after test
-        Collections.shuffle(p1PotentialSetMeld);
 
         Collections.sort(p1PotentialSetMeld, new Comparator<Card>() {
             @Override
@@ -245,7 +241,6 @@ public class Shivani implements PlayerStrategy{
                 i++;
             }
         }
-        //-------------------------------------------------------------------------------
     }
 
     // Calculate deadwood points
@@ -258,5 +253,15 @@ public class Shivani implements PlayerStrategy{
 
     }
 
+    //reveals the whole hand of the player including deadwood cards as well as melds
+    public List<Card> revealCards() {
+        //cardsNotInMeld are already in the player's hand
+        //add the meld objects to the player's hand and reveal the whole hand
+        for (Meld meldObj : totalMelds) {
+            Card[] meldContents = meldObj.getCards();
+            Collections.addAll(hand, meldContents);
+        }
+        return hand;
+    }
 
 }

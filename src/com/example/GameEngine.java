@@ -22,7 +22,7 @@ public class GameEngine {
         // Initialize deck, shuffle deck, deal deck, create discard pile, play first round and play normalRounds
 
         GameEngine.initializeDeck();
-        GameEngine.shuffleDeck();
+        //GameEngine.shuffleDeck();
         GameEngine.dealDeck();
 
         PlayerStrategy nextActionPlayer = GameEngine.playFirstRound();
@@ -35,7 +35,7 @@ public class GameEngine {
     public static void initializeDeck() {
         deck = new ArrayList<Card>();
         deck.addAll(Card.getAllCards());
-        //Collections.sort(deck);
+        Collections.sort(deck);
     }
 
     //-------------------------------------------------------------------------------
@@ -51,8 +51,8 @@ public class GameEngine {
     public static void dealDeck() {
         List<Card> hand1 = new ArrayList<Card>();
         List<Card> hand2 = new ArrayList<Card>();
-        for (int i = 0; i < 20; i++) {
-            if (i % 2 == 0) {
+        for (int i = 0; i < 10; i++) {
+            if (i % 1 == 0) {
                 //beginning of the array is the top of the deck
                 hand1.add(deck.remove(0));
             } else {
@@ -106,16 +106,28 @@ public class GameEngine {
         // Assume starting player can gin first.
         if (p1.knock()) {
             // p1 reveals their cards
-            Tuple<List<Meld>, List<Card>> revealCards = p1.revealCards();
+
+            //Tuple<List<Meld>, List<Card>> revealCards = p1.revealCards();
+            //List<Card> revealCards = p1.revealCards();
+
             // p2 should be able to check if he can use his cards in p1's melds
             // add the points to either p1 or p2
-            List<Meld> p1Melds = revealCards.first();
-            List<Card> p1DeadwoodCards = revealCards.second();
+            //List<Meld> p1Melds = revealCards.first();
+            //List<Card> p1DeadwoodCards = revealCards.second();
             // Award points
 
             // check if game is over depending on number of points.
         } else if (p2.knock()) {
-            // follow strategy from above.
+            // p2 reveals their cards
+            //Tuple<List<Meld>, List<Card>> revealCards = p2.revealCards();
+//            List<Card> revealCards = p2.revealCards();
+//            // p1 should be able to check if he can use his cards in p2's melds
+//            // add the points to either p1 or p2
+//            List<Meld> p2Melds = revealCards.first();
+//            List<Card> p2DeadwoodCards = revealCards.second();
+            // Award points
+
+            // check if game is over depending on number of points.
         }
 
         return nextActionPlayer;
@@ -127,16 +139,41 @@ public class GameEngine {
     public static void playNormalRound(PlayerStrategy nextActionPlayer) {
         // TODO(jainshivani99) do implementation, following similar style
         // to playFirstRound.
-        return;
+
+        //Checking if the deck is empty, which means that the round ends
+
+            Card topCard = discardPile.get(0);
+            Card returnCard;
+
+            //Start off the round with p1
+            if (p1.willTakeTopDiscard(topCard)) {
+                returnCard = p1.drawAndDiscard(topCard);
+                nextActionPlayer = p2;
+                p2.opponentEndTurnFeedback(true, topCard, returnCard);
+            } else {
+                Card cardFromDeck = deck.get(0);
+                returnCard = p1.drawAndDiscard(cardFromDeck);
+                nextActionPlayer = p2;
+                p2.opponentEndTurnFeedback(false, cardFromDeck, returnCard);
+            }
+
+            //p2's turn
+            if (p2.willTakeTopDiscard(topCard)) {
+                returnCard = p2.drawAndDiscard(topCard);
+                nextActionPlayer = p1;
+                p1.opponentEndTurnFeedback(true, topCard, returnCard);
+            } else {
+                Card cardFromDeck = deck.get(0);
+                returnCard = p2.drawAndDiscard(cardFromDeck);
+                nextActionPlayer = p1;
+                p1.opponentEndTurnFeedback(false, cardFromDeck, returnCard);
+            }
+
+
+        System.out.println("This round has ended in a tie. No points will be awarded.");
+        //p1.opponentEndRoundFeedback();
+        //p2.opponentEndRoundFeedback();
     }
-    //-------------------------------------------------------------------------------
-//    // Calculate deadwood points
-//    public static int calculateDeadwoodPoints (List<Card> cardsNotInMeld, int deadwoodPoints) {
-//
-//        for (Card cardObj : cardsNotInMeld) {
-//            deadwoodPoints += cardObj.getPointValue();
-//        }
-//        return deadwoodPoints;
-//    }
+
 }
 
