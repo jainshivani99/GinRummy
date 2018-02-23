@@ -7,7 +7,7 @@ import com.example.PlayerStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Jill implements PlayerStrategy {
+public class Jill extends Player {
 
     //The player's hand of cards
     private List<Card> hand = new ArrayList<Card>();

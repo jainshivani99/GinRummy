@@ -10,9 +10,11 @@ public class GameEngine {
 
     private static List<Card> deck;
     private static List<Card> discardPile = new ArrayList<Card>();
-    private static PlayerStrategy p1 = new Shivani();
-    private static PlayerStrategy p2 = new Jack();
-    private static PlayerStrategy p3 = new Jill();
+    private static Player p1 = new Shivani();
+    private static Player p2 = new Jack();
+    private static Player p3 = new Jill();
+    private static final int DEADWOOD_POINTS_BOUNDARY = 25;
+    private static final int DEADWOOD_POINTS_END = 50;
     //-------------------------------------------------------------------------------
     // Execute Main Method
 
@@ -71,13 +73,10 @@ public class GameEngine {
 
 
     //-------------------------------------------------------------------------------
-    /** Playing the first round
+    /** Playing the first round of the game
      @return The PlayerStrategy that goes next.
      */
     public static PlayerStrategy playFirstRound() {
-        // TODO(jainshivani99) Can players knock right after receiving
-        // their hands??
-        // Assume players can only knock/gin at the end of a round.
 
         // Assume that p1 is always the starting player
         Card topCard = discardPile.get(0);
@@ -96,7 +95,7 @@ public class GameEngine {
             deck.remove(0);
             returnCard = p1.drawAndDiscard(drawCard);
             nextActionPlayer = p2;
-            p2.opponentEndTurnFeedback(true, drawCard, returnCard);
+            p2.opponentEndTurnFeedback(false, drawCard, returnCard);
         }
         // put return card ON TOP OF discard pile.
         discardPile.add(0, returnCard);
@@ -106,28 +105,84 @@ public class GameEngine {
         // Assume starting player can gin first.
         if (p1.knock()) {
             // p1 reveals their cards
+            List<Meld> revealMelds = p1.getMelds();
 
-            //Tuple<List<Meld>, List<Card>> revealCards = p1.revealCards();
-            //List<Card> revealCards = p1.revealCards();
+            int p1DeadwoodPoints = p1.calculateDeadwoodPoints();
+            int p2DeadwoodPoints = p2.calculateDeadwoodPoints();
+
+            //check if p1 has declared gin, which means that they will be awarded points and p2 cannot add to their melds
+            if (p1DeadwoodPoints == 0) {
+                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + p2DeadwoodPoints;
+
+            }
 
             // p2 should be able to check if he can use his cards in p1's melds
-            // add the points to either p1 or p2
-            //List<Meld> p1Melds = revealCards.first();
-            //List<Card> p1DeadwoodCards = revealCards.second();
-            // Award points
+            List<Card> revealOpponentsCardsNotInMeld = p2.revealCardsNotInMeld();
+            for (Meld meldObj : revealMelds) {
+                for (Card cardObj : revealOpponentsCardsNotInMeld) {
+                    if (meldObj.canAppendCard(cardObj)) {
+                        meldObj.appendCard(cardObj);
+                        revealOpponentsCardsNotInMeld.remove(cardObj);
+                        break;
+                    }
+                }
+            }
+            // add knock points to either p1 or p2
+            if (p1DeadwoodPoints < p2DeadwoodPoints) {
+                int newDeadWoodPoints = p1DeadwoodPoints - p2DeadwoodPoints;
+                p1.setTotalPoints(newDeadWoodPoints);
+            } else {
+                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + (p1DeadwoodPoints - p2DeadwoodPoints);
+                p2.setTotalPoints(newDeadWoodPoints);
+            }
 
-            // check if game is over depending on number of points.
+            // check if game is over depending on if either player has reached 50 points
+            if (p1.getTotalPoints() >= DEADWOOD_POINTS_END || p2.getTotalPoints() >= DEADWOOD_POINTS_END) {
+                System.out.println("The game has ended.");
+                System.exit(0);
+            }
+
+            //update nextActionPlayer?
         } else if (p2.knock()) {
             // p2 reveals their cards
-            //Tuple<List<Meld>, List<Card>> revealCards = p2.revealCards();
-//            List<Card> revealCards = p2.revealCards();
-//            // p1 should be able to check if he can use his cards in p2's melds
-//            // add the points to either p1 or p2
-//            List<Meld> p2Melds = revealCards.first();
-//            List<Card> p2DeadwoodCards = revealCards.second();
-            // Award points
+            List<Meld> revealMelds = p2.getMelds();
 
-            // check if game is over depending on number of points.
+            int p1DeadwoodPoints = p1.calculateDeadwoodPoints();
+            int p2DeadwoodPoints = p2.calculateDeadwoodPoints();
+
+            //check if p2 has declared gin, which means that they will be awarded points and p1 cannot add to their melds
+            if (p2DeadwoodPoints == 0) {
+                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + p1DeadwoodPoints;
+
+            }
+
+            // p2 should be able to check if he can use his cards in p1's melds
+            List<Card> revealOpponentsCardsNotInMeld = p1.revealCardsNotInMeld();
+            for (Meld meldObj : revealMelds) {
+                for (Card cardObj : revealOpponentsCardsNotInMeld) {
+                    if (meldObj.canAppendCard(cardObj)) {
+                        meldObj.appendCard(cardObj);
+                        revealOpponentsCardsNotInMeld.remove(cardObj);
+                        break;
+                    }
+                }
+            }
+            // add knock points to either p1 or p2
+            if (p2DeadwoodPoints < p1DeadwoodPoints) {
+                int newDeadWoodPoints = p2DeadwoodPoints - p1DeadwoodPoints;
+                p2.setTotalPoints(newDeadWoodPoints);
+            } else {
+                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + (p2DeadwoodPoints - p1DeadwoodPoints);
+                p1.setTotalPoints(newDeadWoodPoints);
+            }
+
+            // check if game is over depending on if either player has reached 50 points
+            if (p2.getTotalPoints() >= DEADWOOD_POINTS_END || p1.getTotalPoints() >= DEADWOOD_POINTS_END) {
+                System.out.println("The game has ended.");
+                System.exit(0);
+            }
+
+            //update nextActionPlayer?
         }
 
         return nextActionPlayer;

@@ -7,16 +7,7 @@ import com.example.PlayerStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Jack implements PlayerStrategy {
-
-    //The player's hand of cards
-    private List<Card> hand = new ArrayList<Card>();
-    private static List<Card> cardsNotInMeld = new ArrayList<Card>();
-    private static List<Meld> totalMelds = new ArrayList<Meld>();
-    private static int deadwoodPoints;
-    private static int knockLevel = 7;
-
-    private static boolean isKnocking = false;
+public class Jack extends Player {
 
     /**
      * Called by the game engine for each player at the beginning of each round to receive and
