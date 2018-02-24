@@ -9,6 +9,9 @@ import java.util.List;
 
 public class Jack extends Player {
 
+    //All 3 players have a different knock level, or a different amount of points that they call knock at
+    private int knockLevel = 3;
+
     /**
      * Called by the game engine for each player at the beginning of each round to receive and
      * process their initial hand dealt.
@@ -16,7 +19,11 @@ public class Jack extends Player {
      * @param hand The initial hand dealt to the player
      */
     public void receiveInitialHand(List<Card> hand){
-
+        this.cardsNotInMeld = hand;
+        this.createRunMeld();
+        this.createSetMeld();
+        this.deadwoodPoints = this.calculateDeadwoodPoints();
+        this.knock();
     }
 
     /**
@@ -27,7 +34,15 @@ public class Jack extends Player {
      * @return whether the user takes the card on the discard pile
      */
     public boolean willTakeTopDiscard(Card card){
-        return false;
+        boolean tookDiscardCard = false;
+        for (Meld meldObj : totalMelds) {
+            if (meldObj.canAppendCard(card)) {
+                tookDiscardCard = true;
+                meldObj.appendCard(card);
+                break;
+            }
+        }
+        return tookDiscardCard;
     }
 
     /**
@@ -38,7 +53,22 @@ public class Jack extends Player {
      * @return The card the player has chosen to discard
      */
     public Card drawAndDiscard(Card drawnCard){
-        return null;
+        cardsNotInMeld.add(drawnCard);
+        Card cardToDiscard = cardsNotInMeld.get(0);
+        for (Meld meldObj : totalMelds) {
+            //check if your drawn card can be appended to a meld
+            //if it can, remove a different card from your hand
+            if (meldObj.canAppendCard(drawnCard)) {
+                meldObj.appendCard(drawnCard);
+                cardsNotInMeld.remove(drawnCard);
+                cardsNotInMeld.remove(cardToDiscard);
+                break;
+            } else {
+                //if it cannot, remove that same card
+                cardsNotInMeld.remove(drawnCard);
+            }
+        }
+        return cardToDiscard;
     }
 
     /**
@@ -48,7 +78,10 @@ public class Jack extends Player {
      * @return True if the player has decided to knock
      */
     public boolean knock(){
-        return false;
+        if (deadwoodPoints <= knockLevel) {
+            isKnocking = true;
+        }
+        return isKnocking;
     }
 
     /**
@@ -59,7 +92,9 @@ public class Jack extends Player {
      * @param previousDiscardTop What the opponent could have drawn from the discard if they chose to
      * @param opponentDiscarded The card that the opponent discarded
      */
-    public void opponentEndTurnFeedback(boolean drewDiscard, Card previousDiscardTop, Card opponentDiscarded){}
+    public void opponentEndTurnFeedback(boolean drewDiscard, Card previousDiscardTop, Card opponentDiscarded){
+
+    }
 
     /**
      * Called by the game engine when the round has ended to provide this player strategy
@@ -68,7 +103,9 @@ public class Jack extends Player {
      * @param opponentHand The opponent's hand at the end of the round
      * @param opponentMelds The opponent's Melds at the end of the round
      */
-    public void opponentEndRoundFeedback(List<Card> opponentHand, List<Meld> opponentMelds){}
+    public void opponentEndRoundFeedback(List<Card> opponentHand, List<Meld> opponentMelds){
+
+    }
 
     /**
      * Called by the game engine to allow access the player's current list of Melds.
@@ -76,7 +113,7 @@ public class Jack extends Player {
      * @return The player's list of melds.
      */
     public List<Meld> getMelds(){
-        return null;
+        return totalMelds;
     }
 
     /**
@@ -84,7 +121,10 @@ public class Jack extends Player {
      * competing it against a new opponent.
      */
     public void reset(){
-
+        //clear the hand of cards and all melds, reset the deadwood points to 0
+        cardsNotInMeld.clear();
+        deadwoodPoints = 0;
+        //Jack does not clear his total melds from the previous game! He tries to cheat!
     }
 
 }

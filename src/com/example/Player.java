@@ -8,11 +8,10 @@ import java.util.List;
 public abstract class Player implements PlayerStrategy {
 
 
-    //protected List<Card> hand = new ArrayList<Card>();
     protected List<Card> cardsNotInMeld = new ArrayList<Card>();
     protected List<Meld> totalMelds = new ArrayList<Meld>();
     protected int deadwoodPoints;
-    protected int knockLevel = 7;
+    protected int knockLevel;
     protected boolean isKnocking = false;
     protected int totalPoints;
 

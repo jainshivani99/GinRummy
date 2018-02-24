@@ -11,6 +11,8 @@ import java.util.List;
 
 public class Shivani extends Player{
 
+    //All 3 players have a different knock level, or a different amount of points that they call knock at
+    private int knockLevel = 7;
 
     /**
      * Called by the game engine for each player at the beginning of each round to receive and
@@ -20,7 +22,7 @@ public class Shivani extends Player{
      */
     public void receiveInitialHand(List<Card> hand){
         this.cardsNotInMeld = hand;
-        //this.createRunMeld();
+        this.createRunMeld();
         this.createSetMeld();
         this.deadwoodPoints = this.calculateDeadwoodPoints();
         this.knock();
@@ -93,8 +95,8 @@ public class Shivani extends Player{
      * @param previousDiscardTop What the opponent could have drawn from the discard if they chose to
      * @param opponentDiscarded The card that the opponent discarded
      */
-    public void opponentEndTurnFeedback(boolean drewDiscard, Card previousDiscardTop, Card opponentDiscarded){
-
+    public void opponentEndTurnFeedback(boolean drewDiscard, Card previousDiscardTop, Card opponentDiscarded) {
+        
     }
 
     /**
@@ -104,7 +106,7 @@ public class Shivani extends Player{
      * @param opponentHand The opponent's hand at the end of the round
      * @param opponentMelds The opponent's Melds at the end of the round
      */
-    public void opponentEndRoundFeedback(List<Card> opponentHand, List<Meld> opponentMelds){
+    public void opponentEndRoundFeedback(List<Card> opponentHand, List<Meld> opponentMelds) {
 
     }
 

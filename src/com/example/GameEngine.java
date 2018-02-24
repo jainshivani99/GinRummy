@@ -24,10 +24,10 @@ public class GameEngine {
         // Initialize deck, shuffle deck, deal deck, create discard pile, play first round and play normalRounds
 
         GameEngine.initializeDeck();
-        //GameEngine.shuffleDeck();
+        GameEngine.shuffleDeck();
         GameEngine.dealDeck();
 
-        PlayerStrategy nextActionPlayer = GameEngine.playFirstRound();
+        Player nextActionPlayer = GameEngine.playFirstRound();
         GameEngine.playNormalRound(nextActionPlayer);
     }
 
@@ -53,8 +53,8 @@ public class GameEngine {
     public static void dealDeck() {
         List<Card> hand1 = new ArrayList<Card>();
         List<Card> hand2 = new ArrayList<Card>();
-        for (int i = 0; i < 10; i++) {
-            if (i % 1 == 0) {
+        for (int i = 0; i < 20; i++) {
+            if (i % 2 == 0) {
                 //beginning of the array is the top of the deck
                 hand1.add(deck.remove(0));
             } else {
@@ -76,12 +76,12 @@ public class GameEngine {
     /** Playing the first round of the game
      @return The PlayerStrategy that goes next.
      */
-    public static PlayerStrategy playFirstRound() {
+    public static Player playFirstRound() {
 
         // Assume that p1 is always the starting player
         Card topCard = discardPile.get(0);
         Card returnCard;
-        PlayerStrategy nextActionPlayer;
+        Player nextActionPlayer;
         if (p1.willTakeTopDiscard(topCard)) {
             returnCard = p1.drawAndDiscard(topCard);
             nextActionPlayer = p2;
@@ -97,92 +97,16 @@ public class GameEngine {
             nextActionPlayer = p2;
             p2.opponentEndTurnFeedback(false, drawCard, returnCard);
         }
-        // put return card ON TOP OF discard pile.
+        // put return card ON TOP OFF discard pile.
         discardPile.add(0, returnCard);
 
 
         // allow players to knock/gin
-        // Assume starting player can gin first.
+        // Assume starting player can knock/gin first.
         if (p1.knock()) {
-            // p1 reveals their cards
-            List<Meld> revealMelds = p1.getMelds();
-
-            int p1DeadwoodPoints = p1.calculateDeadwoodPoints();
-            int p2DeadwoodPoints = p2.calculateDeadwoodPoints();
-
-            //check if p1 has declared gin, which means that they will be awarded points and p2 cannot add to their melds
-            if (p1DeadwoodPoints == 0) {
-                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + p2DeadwoodPoints;
-
-            }
-
-            // p2 should be able to check if he can use his cards in p1's melds
-            List<Card> revealOpponentsCardsNotInMeld = p2.revealCardsNotInMeld();
-            for (Meld meldObj : revealMelds) {
-                for (Card cardObj : revealOpponentsCardsNotInMeld) {
-                    if (meldObj.canAppendCard(cardObj)) {
-                        meldObj.appendCard(cardObj);
-                        revealOpponentsCardsNotInMeld.remove(cardObj);
-                        break;
-                    }
-                }
-            }
-            // add knock points to either p1 or p2
-            if (p1DeadwoodPoints < p2DeadwoodPoints) {
-                int newDeadWoodPoints = p1DeadwoodPoints - p2DeadwoodPoints;
-                p1.setTotalPoints(newDeadWoodPoints);
-            } else {
-                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + (p1DeadwoodPoints - p2DeadwoodPoints);
-                p2.setTotalPoints(newDeadWoodPoints);
-            }
-
-            // check if game is over depending on if either player has reached 50 points
-            if (p1.getTotalPoints() >= DEADWOOD_POINTS_END || p2.getTotalPoints() >= DEADWOOD_POINTS_END) {
-                System.out.println("The game has ended.");
-                System.exit(0);
-            }
-
-            //update nextActionPlayer?
+            GameEngine.callKnock(p1, p2);
         } else if (p2.knock()) {
-            // p2 reveals their cards
-            List<Meld> revealMelds = p2.getMelds();
-
-            int p1DeadwoodPoints = p1.calculateDeadwoodPoints();
-            int p2DeadwoodPoints = p2.calculateDeadwoodPoints();
-
-            //check if p2 has declared gin, which means that they will be awarded points and p1 cannot add to their melds
-            if (p2DeadwoodPoints == 0) {
-                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + p1DeadwoodPoints;
-
-            }
-
-            // p2 should be able to check if he can use his cards in p1's melds
-            List<Card> revealOpponentsCardsNotInMeld = p1.revealCardsNotInMeld();
-            for (Meld meldObj : revealMelds) {
-                for (Card cardObj : revealOpponentsCardsNotInMeld) {
-                    if (meldObj.canAppendCard(cardObj)) {
-                        meldObj.appendCard(cardObj);
-                        revealOpponentsCardsNotInMeld.remove(cardObj);
-                        break;
-                    }
-                }
-            }
-            // add knock points to either p1 or p2
-            if (p2DeadwoodPoints < p1DeadwoodPoints) {
-                int newDeadWoodPoints = p2DeadwoodPoints - p1DeadwoodPoints;
-                p2.setTotalPoints(newDeadWoodPoints);
-            } else {
-                int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + (p2DeadwoodPoints - p1DeadwoodPoints);
-                p1.setTotalPoints(newDeadWoodPoints);
-            }
-
-            // check if game is over depending on if either player has reached 50 points
-            if (p2.getTotalPoints() >= DEADWOOD_POINTS_END || p1.getTotalPoints() >= DEADWOOD_POINTS_END) {
-                System.out.println("The game has ended.");
-                System.exit(0);
-            }
-
-            //update nextActionPlayer?
+            GameEngine.callKnock(p2, p1);
         }
 
         return nextActionPlayer;
@@ -190,44 +114,110 @@ public class GameEngine {
 
 
     //-------------------------------------------------------------------------------
-    // Playing the Normal round
-    public static void playNormalRound(PlayerStrategy nextActionPlayer) {
-        // TODO(jainshivani99) do implementation, following similar style
-        // to playFirstRound.
+    /** Playing a normal round of the game
+     @param nextActionPlayer the PlayerStrategy that starts the game.
+     */
+    public static void playNormalRound(Player nextActionPlayer) {
+
+        //Checking which player is nextActionPlayer and assigning the otherPlayer
+        Player otherPlayer;
+        if (nextActionPlayer == p1) {
+            otherPlayer = p2;
+        } else {
+            otherPlayer = p1;
+        }
 
         //Checking if the deck is empty, which means that the round ends
-
+        while (deck.size() > 0) {
             Card topCard = discardPile.get(0);
             Card returnCard;
 
-            //Start off the round with p1
-            if (p1.willTakeTopDiscard(topCard)) {
-                returnCard = p1.drawAndDiscard(topCard);
-                nextActionPlayer = p2;
-                p2.opponentEndTurnFeedback(true, topCard, returnCard);
+            //Start off the round with nextActionPlayer
+            if (nextActionPlayer.willTakeTopDiscard(topCard)) {
+                returnCard = nextActionPlayer.drawAndDiscard(topCard);
+                discardPile.add(0, returnCard);
+                otherPlayer.opponentEndTurnFeedback(true, topCard, returnCard);
             } else {
                 Card cardFromDeck = deck.get(0);
-                returnCard = p1.drawAndDiscard(cardFromDeck);
+                returnCard = nextActionPlayer.drawAndDiscard(cardFromDeck);
+                discardPile.add(0, returnCard);
                 nextActionPlayer = p2;
-                p2.opponentEndTurnFeedback(false, cardFromDeck, returnCard);
+                otherPlayer = p1;
+                otherPlayer.opponentEndTurnFeedback(false, cardFromDeck, returnCard);
             }
 
-            //p2's turn
-            if (p2.willTakeTopDiscard(topCard)) {
-                returnCard = p2.drawAndDiscard(topCard);
-                nextActionPlayer = p1;
-                p1.opponentEndTurnFeedback(true, topCard, returnCard);
+            //otherPlayer's turn
+            if (otherPlayer.willTakeTopDiscard(topCard)) {
+                returnCard = otherPlayer.drawAndDiscard(topCard);
+                discardPile.add(0, returnCard);
+                nextActionPlayer.opponentEndTurnFeedback(true, topCard, returnCard);
             } else {
                 Card cardFromDeck = deck.get(0);
-                returnCard = p2.drawAndDiscard(cardFromDeck);
+                returnCard = otherPlayer.drawAndDiscard(cardFromDeck);
+                discardPile.add(0, returnCard);
+                nextActionPlayer.opponentEndTurnFeedback(false, cardFromDeck, returnCard);
                 nextActionPlayer = p1;
-                p1.opponentEndTurnFeedback(false, cardFromDeck, returnCard);
+                otherPlayer = p2;
             }
 
+            // allow players to knock/gin
+            if (nextActionPlayer.knock()) {
+                GameEngine.callKnock(nextActionPlayer, otherPlayer);
+                break;
+            } else if (otherPlayer.knock()) {
+                GameEngine.callKnock(otherPlayer, nextActionPlayer);
+                break;
+            }
+
+        }
 
         System.out.println("This round has ended in a tie. No points will be awarded.");
-        //p1.opponentEndRoundFeedback();
-        //p2.opponentEndRoundFeedback();
+        p1.opponentEndRoundFeedback(p2.revealCardsNotInMeld(), p2.getMelds());
+        p2.opponentEndRoundFeedback(p1.revealCardsNotInMeld(), p1.getMelds());
+
+    }
+
+    public static void callKnock(Player knockPlayer, Player opponent) {
+        //the player that knocked reveals their cards
+        List<Meld> revealMelds = knockPlayer.getMelds();
+
+        int knockPlayerDeadwoodPoints = knockPlayer.calculateDeadwoodPoints();
+        int opponentDeadwoodPoints = opponent.calculateDeadwoodPoints();
+
+        //check if knocking player has declared gin, which means that they will be awarded points and the
+        // opponent cannot add to their melds
+        if (knockPlayerDeadwoodPoints == 0) {
+            int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + opponentDeadwoodPoints;
+
+        }
+
+        // the opponent should be able to check if he can use his cards in the knocking player's melds
+        List<Card> revealOpponentsCardsNotInMeld = opponent.revealCardsNotInMeld();
+        for (Meld meldObj : revealMelds) {
+            for (Card cardObj : revealOpponentsCardsNotInMeld) {
+                if (meldObj.canAppendCard(cardObj)) {
+                    meldObj.appendCard(cardObj);
+                    revealOpponentsCardsNotInMeld.remove(cardObj);
+                    break;
+                }
+            }
+        }
+        //add knock points to either the knocking player or  opponent
+        if (knockPlayerDeadwoodPoints < opponentDeadwoodPoints) {
+            int newDeadWoodPoints = knockPlayerDeadwoodPoints - opponentDeadwoodPoints;
+            knockPlayer.setTotalPoints(newDeadWoodPoints);
+        } else {
+            int newDeadWoodPoints = DEADWOOD_POINTS_BOUNDARY + (knockPlayerDeadwoodPoints - opponentDeadwoodPoints);
+            opponent.setTotalPoints(newDeadWoodPoints);
+        }
+
+        // check if game is over depending on if either player has reached 50 points
+        if (knockPlayer.getTotalPoints() >= DEADWOOD_POINTS_END || opponent.getTotalPoints() >= DEADWOOD_POINTS_END) {
+            System.out.println("The game has ended.");
+            System.exit(0);
+        }
+
+
     }
 
 }
