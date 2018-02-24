@@ -17,7 +17,7 @@ public class Jill extends Player {
      *
      * @param hand The initial hand dealt to the player
      */
-    public void receiveInitialHand(List<Card> hand){
+    public void receiveInitialHand(List<Card> hand) {
         this.cardsNotInMeld = hand;
         this.createRunMeld();
         this.createSetMeld();
@@ -32,7 +32,7 @@ public class Jill extends Player {
      * @param card The card on the top of the discard pile
      * @return whether the user takes the card on the discard pile
      */
-    public boolean willTakeTopDiscard(Card card){
+    public boolean willTakeTopDiscard(Card card) {
         boolean tookDiscardCard = false;
         for (Meld meldObj : totalMelds) {
             if (meldObj.canAppendCard(card)) {
@@ -92,7 +92,16 @@ public class Jill extends Player {
      * @param opponentDiscarded The card that the opponent discarded
      */
     public void opponentEndTurnFeedback(boolean drewDiscard, Card previousDiscardTop, Card opponentDiscarded){
-
+        boolean canAppendDiscard;
+        boolean canAppendOpponentDiscard;
+        //if the opponent drew the discard card, check to see if the previousDiscardTop or opponentDiscarded card could be
+        //appended to the player's melds
+        if (drewDiscard) {
+            for (Meld meldObj : totalMelds) {
+                canAppendDiscard = meldObj.canAppendCard(previousDiscardTop);
+                canAppendOpponentDiscard = meldObj.canAppendCard(opponentDiscarded);
+            }
+        }
     }
 
     /**
@@ -103,7 +112,17 @@ public class Jill extends Player {
      * @param opponentMelds The opponent's Melds at the end of the round
      */
     public void opponentEndRoundFeedback(List<Card> opponentHand, List<Meld> opponentMelds){
-
+        boolean canAppend;
+        //check to see if any cards in the opponent's hand can be added to your melds
+        for (Card cardObj : opponentHand) {
+            for (Meld meldObj : totalMelds) {
+                canAppend = meldObj.canAppendCard(cardObj);
+            }
+        }
+        //check the cards in the opponent's melds
+        for (Meld meldObj : opponentMelds) {
+            Card[] opponentMeldCards = meldObj.getCards();
+        }
     }
 
     /**
